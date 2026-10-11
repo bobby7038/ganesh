@@ -13,6 +13,7 @@ import {
   Building2,
   ShieldCheck
 } from 'lucide-react';
+import { openWhatsApp } from '../../utils/whatsapp';
 
 export default function ReceiptModal({ record, onClose, committeeDetails }) {
   if (!record) return null;
@@ -23,10 +24,6 @@ export default function ReceiptModal({ record, onClose, committeeDetails }) {
 
   // Format WhatsApp Share text
   const shareWhatsApp = () => {
-    let digits = record.phone ? record.phone.replace(/\D/g, '') : '';
-    if (digits.length === 10) digits = `91${digits}`;
-    else if (digits.length === 11 && digits.startsWith('0')) digits = `91${digits.slice(1)}`;
-
     const text = `🪔 *SRI VINAYAKA CHAVITHI UTSAV SAMITHI* 🪔\n` +
       `*Chanda Receipt Acknowledgment*\n\n` +
       `*Receipt No:* ${record.receiptNo}\n` +
@@ -38,13 +35,7 @@ export default function ReceiptModal({ record, onClose, committeeDetails }) {
       `*Date:* ${new Date(record.date).toLocaleDateString('en-IN')}\n\n` +
       `🙏 _May Lord Ganesha bless you and your family with peace, health & prosperity! Jai Ganesha!_ 🙏`;
 
-    const isMobile = typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const encoded = encodeURIComponent(text);
-    const whatsappUrl = digits 
-      ? `https://api.whatsapp.com/send?phone=${digits}&text=${encoded}` 
-      : `https://api.whatsapp.com/send?text=${encoded}`;
-
-    window.open(whatsappUrl, '_blank');
+    openWhatsApp({ phone: record.phone, text });
   };
 
   return (

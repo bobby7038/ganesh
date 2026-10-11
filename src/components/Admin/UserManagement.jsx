@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Users, UserPlus, Phone, Key, Trash2, Search, CheckCircle2, Edit3, Share2 } from 'lucide-react';
 import { COMMITTEE_ROLES, getRoleById, getUserRoles } from '../../data/roles';
 import EditUserModal from './EditUserModal';
+import { openWhatsApp } from '../../utils/whatsapp';
 
 export default function UserManagement({ usersList, currentUser, onOpenAddUser, onDeleteUser, onUpdateUser }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -10,25 +11,17 @@ export default function UserManagement({ usersList, currentUser, onOpenAddUser, 
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   const handleShareWhatsApp = (user) => {
-    let digits = user.phone ? user.phone.replace(/\D/g, '') : '';
-    if (digits.length === 10) digits = `91${digits}`;
-    else if (digits.length === 11 && digits.startsWith('0')) digits = `91${digits.slice(1)}`;
-
+    const portalUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5173';
     const text = `🪔 *SRI GANESH UTSAV SAMITHI* 🪔\n` +
       `*Committee Member Access Credentials*\n\n` +
       `👤 *Member Name:* ${user.name}\n` +
       `🏷️ *Role / Designation:* ${user.designation}\n` +
       `📱 *Registered Phone:* ${user.phone}\n` +
       `🔑 *App Login Passcode:* ${user.passcode}\n\n` +
-      `📲 *Web Portal:* http://localhost:8080\n\n` +
+      `📲 *Web Portal:* ${portalUrl}\n\n` +
       `🙏 _Thank you for guiding and managing our Utsav collections! Jai Ganesha!_ 🙏`;
 
-    const encoded = encodeURIComponent(text);
-    const whatsappUrl = digits 
-      ? `https://api.whatsapp.com/send?phone=${digits}&text=${encoded}` 
-      : `https://api.whatsapp.com/send?text=${encoded}`;
-
-    window.open(whatsappUrl, '_blank');
+    openWhatsApp({ phone: user.phone, text });
   };
 
   const filteredUsers = usersList.filter(user => {

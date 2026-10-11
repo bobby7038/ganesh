@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { X, PlusCircle, Sparkles, Smartphone, Banknote, CheckCircle2 } from 'lucide-react';
+import { X, PlusCircle, Sparkles, Smartphone, Banknote, CheckCircle2, Share2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { openWhatsApp } from '../../utils/whatsapp';
 
 export default function AddChandaModal({ isOpen, onClose, onAddChanda, usersList = [] }) {
+  const [shareOnWhatsApp, setShareOnWhatsApp] = useState(true);
   const [formData, setFormData] = useState({
     donorName: '',
     houseNo: '',
@@ -55,7 +57,23 @@ export default function AddChandaModal({ isOpen, onClose, onAddChanda, usersList
 
     onAddChanda(newRecord);
 
-    // Send 100% automated background WhatsApp receipt via Bot server API
+    // Direct WhatsApp sending on mobile / browser
+    if (shareOnWhatsApp && formData.phone && formData.phone.trim()) {
+      const receiptText = `🪔 *SRI VINAYAKA CHAVITHI UTSAV SAMITHI* 🪔\n` +
+        `*Chanda Receipt Acknowledgment*\n\n` +
+        `*Receipt No:* ${newRecord.receiptNo}\n` +
+        `*Donor Name:* ${newRecord.donorName}\n` +
+        `*House / Flat:* ${newRecord.houseNo}\n` +
+        `*Amount Paid:* ₹${Number(newRecord.amount).toLocaleString('en-IN')}\n` +
+        `*Payment Mode:* ${newRecord.paymentMode} (${newRecord.refNo || 'N/A'})\n` +
+        `*Collected By:* ${newRecord.collectorName}\n` +
+        `*Date:* ${new Date(newRecord.date).toLocaleDateString('en-IN')}\n\n` +
+        `🙏 _May Lord Ganesha bless you and your family with peace, health & prosperity! Jai Ganesha!_ 🙏`;
+
+      openWhatsApp({ phone: formData.phone, text: receiptText });
+    }
+
+    // Also attempt automated background WhatsApp receipt via Bot server API if available
     if (formData.phone && formData.phone.trim()) {
       const apiHost = window.location.hostname || 'localhost';
       fetch(`http://${apiHost}:5000/api/send-receipt`, {
@@ -282,8 +300,30 @@ export default function AddChandaModal({ isOpen, onClose, onAddChanda, usersList
             </div>
           </div>
 
+          {/* Direct WhatsApp Share Toggle */}
+          <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                <Share2 className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-800">Send WhatsApp Receipt</p>
+                <p className="text-[11px] text-slate-500">Opens WhatsApp directly on your phone with pre-filled receipt</p>
+              </div>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input 
+                type="checkbox" 
+                checked={shareOnWhatsApp} 
+                onChange={(e) => setShareOnWhatsApp(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+            </label>
+          </div>
+
           {/* Submit Button */}
-          <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-800">
+          <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-200">
             <button 
               type="button" 
               onClick={onClose}

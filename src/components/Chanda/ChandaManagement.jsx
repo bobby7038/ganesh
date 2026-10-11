@@ -18,6 +18,7 @@ import {
   X
 } from 'lucide-react';
 import ReceiptModal from './ReceiptModal';
+import { openWhatsApp } from '../../utils/whatsapp';
 
 export default function ChandaManagement({ 
   chandaList, 
@@ -316,10 +317,6 @@ export default function ChandaManagement({
 
                       <button 
                         onClick={() => {
-                          let digits = item.phone ? item.phone.replace(/\D/g, '') : '';
-                          if (digits.length === 10) digits = `91${digits}`;
-                          else if (digits.length === 11 && digits.startsWith('0')) digits = `91${digits.slice(1)}`;
-
                           const text = `🪔 *SRI GANESH UTSAV SAMITHI* 🪔\n` +
                             `*Digital Chanda Receipt*\n\n` +
                             `*Receipt No:* ${item.receiptNo}\n` +
@@ -330,13 +327,7 @@ export default function ChandaManagement({
                             `*Collector:* ${item.collectorName || 'Committee'}\n\n` +
                             `🙏 _Thank you for your contribution! May Lord Ganesha bless you and your family!_ 🙏`;
 
-                          const isMobile = typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                          const encoded = encodeURIComponent(text);
-                          const whatsappUrl = digits 
-                            ? `https://api.whatsapp.com/send?phone=${digits}&text=${encoded}` 
-                            : `https://api.whatsapp.com/send?text=${encoded}`;
-
-                          window.open(whatsappUrl, '_blank');
+                          openWhatsApp({ phone: item.phone, text });
                         }}
                         title="Quick WhatsApp Share"
                         className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 border border-emerald-500/30"
