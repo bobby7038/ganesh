@@ -1,0 +1,23 @@
+services:
+  ganesh-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ganesh-utsav-frontend
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  ganesh-whatsapp-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    container_name: ganesh-utsav-bot
+    ports:
+      - "5000:5000"
+    volumes:
+      - wwebjs_auth_data:/app/.wwebjs_auth
+    restart: unless-stopped
+
+volumes:
+  wwebjs_auth_data:
