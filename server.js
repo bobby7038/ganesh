@@ -150,7 +150,8 @@ app.get('/api/status', (req, res) => {
   res.json({
     status: isReady ? 'connected' : 'connecting',
     isReady,
-    qrAvailable: !!qrCodeData
+    qrAvailable: !!qrCodeData,
+    qrImage: qrImageBase64
   });
 });
 

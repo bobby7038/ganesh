@@ -9,7 +9,8 @@ import {
   Receipt,
   Target,
   Eye,
-  Users
+  Users,
+  Bot
 } from 'lucide-react';
 import { COMMITTEE_ROLES, getUserRoles, getRoleById } from '../data/roles';
 
@@ -19,7 +20,9 @@ export default function Header({
   onPrint,
   currentUser,
   onOpenLogin,
-  onLogout
+  onLogout,
+  botStatus,
+  onOpenBotModal
 }) {
   const userRoleIds = getUserRoles(currentUser);
   const isAdmin = userRoleIds.includes('admin') || currentUser?.role === 'admin';
@@ -86,6 +89,23 @@ export default function Header({
               <span>Log In</span>
             </button>
           )}
+
+          {/* WhatsApp Bot Status Button */}
+          <button
+            onClick={onOpenBotModal}
+            title={botStatus?.isReady ? "WhatsApp Bot Active (Sending receipts automatically)" : "Link WhatsApp Bot for automatic sending"}
+            className={`btn text-xs flex items-center gap-1.5 px-3 py-2 transition-all cursor-pointer ${
+              botStatus?.isReady
+                ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-emerald-100'
+                : 'bg-amber-50 text-amber-700 border border-amber-300 hover:bg-amber-100'
+            }`}
+          >
+            <Bot className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">
+              {botStatus?.isReady ? 'Bot Active' : 'Link Bot'}
+            </span>
+            <span className={`w-2 h-2 rounded-full ${botStatus?.isReady ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`}></span>
+          </button>
 
           {/* Print Report Button */}
           <button

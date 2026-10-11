@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { X, PlusCircle, Sparkles, Smartphone, Banknote, CheckCircle2, Share2 } from 'lucide-react';
+import { X, PlusCircle, Sparkles, Smartphone, Banknote, CheckCircle2, Share2, Bot } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { openWhatsApp } from '../../utils/whatsapp';
 
-export default function AddChandaModal({ isOpen, onClose, onAddChanda, usersList = [] }) {
-  const [shareOnWhatsApp, setShareOnWhatsApp] = useState(true);
+export default function AddChandaModal({ isOpen, onClose, onAddChanda, usersList = [], botStatus, onOpenBotModal }) {
+  const [shareOnWhatsApp, setShareOnWhatsApp] = useState(!botStatus?.isReady);
   const [formData, setFormData] = useState({
     donorName: '',
     houseNo: '',
@@ -300,26 +300,53 @@ export default function AddChandaModal({ isOpen, onClose, onAddChanda, usersList
             </div>
           </div>
 
-          {/* Direct WhatsApp Share Toggle */}
-          <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-3">
+          {/* WhatsApp Mode / Automated Bot Section */}
+          <div className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 ${
+            botStatus?.isReady ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200'
+          }`}>
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
-                <Share2 className="w-5 h-5 text-white" />
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm ${
+                botStatus?.isReady ? 'bg-emerald-600 text-white' : 'bg-slate-700 text-white'
+              }`}>
+                {botStatus?.isReady ? <Bot className="w-5 h-5" /> : <Share2 className="w-5 h-5" />}
               </div>
               <div>
-                <p className="text-xs font-bold text-slate-800">Send WhatsApp Receipt</p>
-                <p className="text-[11px] text-slate-500">Opens WhatsApp directly on your phone with pre-filled receipt</p>
+                <p className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <span>{botStatus?.isReady ? 'Automated WhatsApp Bot Active' : 'Send WhatsApp Receipt'}</span>
+                  {botStatus?.isReady && <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>}
+                </p>
+                <p className="text-[11px] text-slate-500">
+                  {botStatus?.isReady 
+                    ? 'Receipt will be delivered 100% automatically in background (no clicking send!)' 
+                    : 'Opens WhatsApp on your device or link the bot for auto-sending'}
+                </p>
               </div>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input 
-                type="checkbox" 
-                checked={shareOnWhatsApp} 
-                onChange={(e) => setShareOnWhatsApp(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-            </label>
+
+            {botStatus?.isReady ? (
+              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-lg">
+                Auto-Send ON
+              </span>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={onOpenBotModal}
+                  className="text-[11px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200"
+                >
+                  Link Bot
+                </button>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={shareOnWhatsApp} 
+                    onChange={(e) => setShareOnWhatsApp(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-10 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                </label>
+              </div>
+            )}
           </div>
 
           {/* Submit Button */}

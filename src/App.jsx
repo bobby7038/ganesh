@@ -14,6 +14,7 @@ import PrintableLedger from './components/PrintReport/PrintableLedger';
 import LuckyDrawManagement from './components/LuckyDraw/LuckyDrawManagement';
 import AuditViewer from './components/Reader/AuditViewer';
 import VolunteerManagement from './components/Volunteer/VolunteerManagement';
+import WhatsAppBotModal from './components/WhatsApp/WhatsAppBotModal';
 import { INITIAL_CHANDA, INITIAL_EXPENSES, INITIAL_USERS, COMMITTEE_DETAILS } from './data/initialData';
 import { getUserRoles } from './data/roles';
 
@@ -55,6 +56,29 @@ export default function App() {
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isBotModalOpen, setIsBotModalOpen] = useState(false);
+
+  // Automated WhatsApp Bot Status
+  const [botStatus, setBotStatus] = useState({ isReady: false, qrImage: null });
+
+  const fetchBotStatus = async () => {
+    try {
+      const apiHost = typeof window !== 'undefined' ? window.location.hostname || 'localhost' : 'localhost';
+      const res = await fetch(`http://${apiHost}:5000/api/status`);
+      if (res.ok) {
+        const data = await res.json();
+        setBotStatus(data);
+      }
+    } catch (e) {
+      // Backend bot offline or port 5000 not reachable
+    }
+  };
+
+  useEffect(() => {
+    fetchBotStatus();
+    const interval = setInterval(fetchBotStatus, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('ganesh_chanda_list', JSON.stringify(chandaList));
@@ -284,6 +308,8 @@ export default function App() {
           onOpenLogin={() => setIsLoginOpen(true)}
           onOpenAddUser={() => setIsAddUserOpen(true)}
           onLogout={handleLogout}
+          botStatus={botStatus}
+          onOpenBotModal={() => setIsBotModalOpen(true)}
         />
 
         {/* Role Dependent Views */}
@@ -304,6 +330,8 @@ export default function App() {
         onClose={() => setIsAddChandaOpen(false)}
         onAddChanda={handleAddChanda}
         usersList={usersList}
+        botStatus={botStatus}
+        onOpenBotModal={() => setIsBotModalOpen(true)}
       />
 
       <AddExpenseModal
@@ -324,6 +352,13 @@ export default function App() {
         onClose={() => setIsLoginOpen(false)}
         usersList={usersList}
         onLoginSuccess={handleLoginSuccess}
+      />
+
+      <WhatsAppBotModal
+        isOpen={isBotModalOpen}
+        onClose={() => setIsBotModalOpen(false)}
+        botStatus={botStatus}
+        onRefreshStatus={fetchBotStatus}
       />
 
       {/* Hidden Printable Area for window.print() */}
