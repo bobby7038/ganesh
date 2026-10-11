@@ -9,6 +9,7 @@ export default defineConfig({
     tailwindcss(),
   ],
   server: {
+    host: true,
     watch: {
       ignored: ['**/.wwebjs_auth/**', '**/node_modules/**']
     }

@@ -55,9 +55,10 @@ export default function AddChandaModal({ isOpen, onClose, onAddChanda, usersList
 
     onAddChanda(newRecord);
 
-    // Send 100% automated background WhatsApp receipt via local Bot server API
+    // Send 100% automated background WhatsApp receipt via Bot server API
     if (formData.phone && formData.phone.trim()) {
-      fetch('http://localhost:5000/api/send-receipt', {
+      const apiHost = window.location.hostname || 'localhost';
+      fetch(`http://${apiHost}:5000/api/send-receipt`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
