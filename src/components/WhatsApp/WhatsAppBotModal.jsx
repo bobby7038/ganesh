@@ -14,10 +14,8 @@ export default function WhatsAppBotModal({ isOpen, onClose, botStatus, onRefresh
     setSendingTest(true);
     setTestResult(null);
 
-    const apiHost = typeof window !== 'undefined' ? window.location.hostname || 'localhost' : 'localhost';
-
     try {
-      const res = await fetch(`http://${apiHost}:5000/api/send-receipt`, {
+      const res = await fetch('/api/send-receipt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

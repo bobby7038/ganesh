@@ -63,8 +63,7 @@ export default function App() {
 
   const fetchBotStatus = async () => {
     try {
-      const apiHost = typeof window !== 'undefined' ? window.location.hostname || 'localhost' : 'localhost';
-      const res = await fetch(`http://${apiHost}:5000/api/status`);
+      const res = await fetch('/api/status');
       if (res.ok) {
         const data = await res.json();
         setBotStatus(data);

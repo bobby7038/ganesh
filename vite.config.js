@@ -10,8 +10,15 @@ export default defineConfig({
   ],
   server: {
     host: true,
+    allowedHosts: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      }
+    },
     watch: {
-      ignored: ['**/.wwebjs_auth/**', '**/node_modules/**']
+      ignored: ['**/.wwebjs_auth/**', '**/node_modules/**', '**/cloudflared.exe', '**/*.exe']
     }
   }
 })
